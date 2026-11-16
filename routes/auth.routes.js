@@ -1,20 +1,24 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { register, login, me } from '../controllers/auth.controller.js';
-import { auth } from '../middlewares/auth.js';
-import { upload } from '../middlewares/upload.js';
+import { register, login, getMe } from '../controllers/auth.controller.js';
+import { protect } from '../middlewares/auth.js';
+import upload from '../middlewares/upload.js';
 import { validate } from '../middlewares/validate.js';
 import { registerSchema, loginSchema } from '../validators/index.js';
 
-// Max 5 failed logins per IP per 15 minutes; successful logins don't count
-const loginLimit = rateLimit({
+const router = Router();
+
+// Max 5 wrong logins per IP in 15 minutes (correct logins are not counted)
+const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
   skipSuccessfulRequests: true,
   message: { message: 'Too many failed login attempts. Try again in 15 minutes' },
 });
 
-export default Router()
-  .post('/register', upload('dp', registerSchema), register)
-  .post('/login', loginLimit, validate(loginSchema), login)
-  .get('/me', auth(), me);
+// Order matters: read form-data (multer) -> check data (zod) -> controller
+router.post('/register', upload.single('dp'), validate(registerSchema), register);
+router.post('/login', loginLimiter, validate(loginSchema), login);
+router.get('/me', protect, getMe);
+
+export default router;

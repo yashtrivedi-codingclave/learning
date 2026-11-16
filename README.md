@@ -19,14 +19,23 @@ Node.js · Express 5 · MongoDB · Mongoose · JWT · bcryptjs · Zod · Multer 
 
 ## Folder structure
 ```
-config/         db, cloudinary, mailer setup
+config/         db connection, Cloudinary (uploadImage / deleteImage), mailer (sendMail)
 models/         User, Product (Mongoose schemas)
-controllers/    auth, user, product controllers (getUsers, getUser, createUser, ...)
-middlewares/    auth (JWT + roles), upload (Multer -> Cloudinary), validate (Zod)
-validators/     Zod schemas for every request body
-routes/         auth, users, products
+controllers/    the actual logic: register, login, getUsers, createProduct, ...
+middlewares/    protect (logged in?), adminOnly (RBAC), upload (Multer), validate (Zod)
+validators/     Zod schemas: which fields each request may send
+routes/         connect URL + middlewares + controller
 utils/          paginate helper
 server.js       app entry point
+```
+
+### How a request flows
+```
+POST /api/products  (form-data: name, price, image)
+  -> protect              is the token valid? sets req.user
+  -> upload.single(...)   multer reads the form-data, file goes to req.file (memory)
+  -> validate(schema)     zod checks name/price, removes unknown fields
+  -> createProduct        uploads req.file to Cloudinary, saves product with owner = req.user
 ```
 
 ## Getting started
@@ -101,9 +110,9 @@ Defaults: `page=1`, `limit=10`. `limit` is capped at 100.
 ### Error responses
 | Status | Meaning |
 |---|---|
-| 400 | Validation failed or invalid id |
+| 400 | Validation failed, invalid id, or file larger than 5 MB |
 | 401 | Not logged in / invalid token |
-| 403 | Logged in but role not allowed |
+| 403 | Logged in but not an admin |
 | 404 | Not found (or not yours) |
 | 409 | Email already registered |
 | 429 | Too many failed login attempts |
