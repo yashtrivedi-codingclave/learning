@@ -9,12 +9,13 @@ Express 5 + MongoDB (Mongoose) REST API using ES modules and an MVC folder struc
 - **Nodemailer** — welcome email on registration
 - **Validation** — request bodies validated with Zod; unknown fields are stripped
 - **CORS** — restricted to `CLIENT_URL`
+- **Helmet** — secure HTTP headers; `trust proxy` is set so rate limiting works behind a proxy (Render, Nginx)
 - **Cascade delete** — deleting a user also deletes their products and images
 - **Pagination** — list endpoints accept `?page=` and `?limit=` (max 100)
 - **Login rate limit** — max 5 failed logins per IP per 15 minutes (successful logins don't count)
 
 ## Tech stack
-Node.js · Express 5 · MongoDB · Mongoose · JWT · bcryptjs · Zod · Multer · Cloudinary · Nodemailer · express-rate-limit
+Node.js · Express 5 · MongoDB · Mongoose · JWT · bcryptjs · Zod · Multer · Cloudinary · Nodemailer · express-rate-limit · Helmet
 
 ## Folder structure
 ```
