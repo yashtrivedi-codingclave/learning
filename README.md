@@ -21,10 +21,11 @@ Node.js · Express 5 · MongoDB · Mongoose · JWT · bcryptjs · Zod · Multer 
 ```
 config/         db, cloudinary, mailer setup
 models/         User, Product (Mongoose schemas)
-controllers/    auth controller + one generic CRUD controller
+controllers/    auth, user, product controllers (getUsers, getUser, createUser, ...)
 middlewares/    auth (JWT + roles), upload (Multer -> Cloudinary), validate (Zod)
 validators/     Zod schemas for every request body
 routes/         auth, users, products
+utils/          paginate helper
 server.js       app entry point
 ```
 
